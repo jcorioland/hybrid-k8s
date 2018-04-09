@@ -7,6 +7,8 @@ Setting up Kubernetes in a hybrid environment imposes some requirement on the se
 
 Note : We do not cover a Kubernetes cluster _spanning_ a hybrid cloud network, but rather how to run a cluster in the cloud and interact with an existing local network seamlessly.
 
+![Kubernetes in an hybrid cloud network](assets/hybrid-k8s.png)
+
 # Pre-requisites
 
 # Infrastructure
