@@ -35,21 +35,24 @@ For your kubernetes cluster to communicate with your on-premise network, you wil
 
 ### Network
 
+deploying Acs-engine on azure, you have 3 options of network policy. Azure CNI, Kubenet, or Calico.
+
 #### Azure CNI
 
 By default, acs-engine is using the [**azure cni** network policy](https://github.com/Azure/acs-engine/blob/master/examples/networkpolicy/README.md#azure-container-networking-default) plugin. This has some advantages and some consequences that must be considered when defining the network where we deploy the cluster. CNI provides an integration with azure subnet ip addressing so that every pod created ny kubernetes is assigned an ip address from the corresponding subnet.
 
 Consequences:
 
+- Plan for *large* address space
 - Subnets where you deploy Kubernetes must be sized according to your scaling plan
-- You must account for [Kubernetes control plane](https://kubernetes.io/docs/concepts/overview/components/)
+- You must account for [Kubernetes control plane](https://kubernetes.io/docs/concepts/overview/components/) services
 - Network Security must be applied at the subnet level, using Azure NSG
 - You can avoid masquerading on outgoing network calls (packets origin are the pod ip, not the node ip)
 
 #### Kubenet
 
 The built-in kubernetes network plugin is [Kubenet](https://kubernetes.io/docs/concepts/cluster-administration/network-plugins/#kubenet).
-Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules.
+Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules. This means you can plan for a much smaller address space as only your nodes will get an ip address on the pre-defined subnet.
 
 ### Kubernetes Services
 
@@ -125,7 +128,7 @@ subsets:
       - port: 8080
 ```
 
-Or you can use an external name in the specification of the service:
+Or if you defined the upstream nameserver appropriately, you can use an external name in the specification of the service:
 
 ```yaml
 kind: Service
@@ -135,7 +138,7 @@ metadata:
   namespace: default
 spec:
   type: ExternalName
-  externalName: external-service.my-company.com
+  externalName: external-service.my-company.local
 ```
 
 Note: when using service without selector, you can't have any Kubernetes readiness/health probe so you have to deal with this point by yourself. For backend services running in Azure, you can use Azure Load Balancers for health probes.
