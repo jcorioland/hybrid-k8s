@@ -1,5 +1,4 @@
 
-
 # Running Kubernetes in a hybrid environment
 
 # Intro
@@ -26,16 +25,24 @@ The network topology must be well defined beforehand to enable peering between t
 
 # Kubernetes
 
+For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup with VPN/ExpressRoute. deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
+
 ## Network
 
-By default, acs-engine network policy is using the **azure cni** plugin. This has some advantages and some consequences that must be considered when defining the network where we deploy the cluster. CNI provides an integration with azure subnet ip addressing so that every pod created ny kubernetes is assigned an ip address from the corresponding subnet.
+### Azure CNI
+
+By default, acs-engine is using the [**azure cni** network policy](https://github.com/Azure/acs-engine/blob/master/examples/networkpolicy/README.md#azure-container-networking-default) plugin. This has some advantages and some consequences that must be considered when defining the network where we deploy the cluster. CNI provides an integration with azure subnet ip addressing so that every pod created ny kubernetes is assigned an ip address from the corresponding subnet.
 
 Consequences:
 
-- --Subnets where you deploy Kubernetes must be sized according to your scaling plan
-- --You must account for Kubernetes components
-- --Network Security must be applied at the subnet level, using Azure NSG
-- --No masquerading happens on outgoing network calls (packets origin are the pod ip, not the node ip)
+- Subnets where you deploy Kubernetes must be sized according to your scaling plan
+- You must account for [Kubernetes control plane](https://kubernetes.io/docs/concepts/overview/components/)
+- Network Security must be applied at the subnet level, using Azure NSG
+- You can avoid masquerading on outgoing network calls (packets origin are the pod ip, not the node ip)
+
+### Kubenet
+
+The built-in kubernetes network plugin is [Kubenet](https://kubernetes.io/docs/concepts/cluster-administration/network-plugins/#kubenet)
 
 ## Kubernetes Services
 
@@ -129,4 +136,3 @@ Note: when using service without selector, you can't have any Kubernetes readine
 ## Devops
 
 # Conclusion
-
