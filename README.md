@@ -22,6 +22,13 @@ The network topology must be well defined beforehand to enable peering between t
 
 ### Dns
 
+In a hybrid environment, you usually want to integrate with your on-premises DNS. There is two aspects to this. The first one is to register the VMs forming the cluster, and using your local search domain when resolving other services. The second is getting the services running on Kubernetes to use the external DNS.
+To benefit the scaling capabilities of the cluster and to ensure resiliency to machine failure, every node configuration needs to be scripted and part of the initial template that acs-engine will deploy. To register the nodes in your DNS at startup, you need to define [an acs-engine extension](https://github.com/Azure/acs-engine/blob/master/docs/extensions.md) that will run your [dns registration script](https://github.com/tesharp/acs-engine/blob/register-dns-extension/extensions/register-dns/v1/register-dns.sh).
+
+In addition, you might want cluster services to address urls outside the cluster using your on-premise dns. To achieve this you need to configure KubeDNS to use your existing nameservice as upstream. [This setup is well documented on kubernetes blog](https://kubernetes.io/blog/2017/04/configuring-private-dns-zones-upstream-nameservers-kubernetes)
+
+Note : There is some ongoing work to make this easier. See [acs-engine#2590](azure/acs-engine#2590)
+
 ## Kubernetes
 
 For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup with VPN/ExpressRoute. deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
