@@ -37,7 +37,94 @@ Consequences:
 - --Network Security must be applied at the subnet level, using Azure NSG
 - --No masquerading happens on outgoing network calls (packets origin are the pod ip, not the node ip)
 
-## Services
+## Kubernetes Services
+
+[Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/) allow to access workloads running inside Kubernetes pods.
+Services can be published to be accessible outside of the Kubernetes cluster, either with a public Azure Load Balancer or with a private Azure Load Balancer (no public IP address).
+
+### Public load-balanced service
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqlservice
+  labels:
+    app: sqlservice
+spec:
+  type: LoadBalancer # Exposed over the internet through Azure Load Balancer
+  ports:
+  - port: 1433
+    targetPort: 1433
+  selector:
+    app: sqlinux
+```
+
+### Private load-balanced service
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-internal-load-balancer
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+```
+
+### External services
+
+When working in a cloud-hybrid environment, it is common to have to deal with external backend services that are running outside the Kubernetes cluster. They can be either running elsewhere in the cloud or on premise, for example.
+
+In those cases you can use services without selector:
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-random-api
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+```
+
+No endpoint will be created for this service. You can create one manually:
+
+```yaml
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: external-random-api
+subsets:
+  - addresses:
+      - ip: 11.1.0.4
+    ports:
+      - port: 8080
+```
+
+Or you can use an external name in the specficiation of the service:
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-service
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: external-service.my-company.com
+```
+
+Note: when using service without selector, you can't have any Kubernetes readiness/health probe so you have to deal with this point by yourself. For backend services running in Azure, you can use Azure Load Balancers for health probes.
 
 ## Devops
 
