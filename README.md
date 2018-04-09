@@ -1,7 +1,6 @@
-
 # Running Kubernetes in a hybrid environment
 
-# Intro
+## Introduction
 
 Setting up Kubernetes in a hybrid environment imposes some requirement on the setup, and implies some considerations around how you will configure your cluster, and plan your deployments. In this guide, we will look at a typical hybrid cloud setup to deploy Kubernetes.
 
@@ -9,27 +8,27 @@ Note : We do not cover a Kubernetes cluster _spanning_ a hybrid cloud network, b
 
 ![Kubernetes in an hybrid cloud network](assets/hybrid-k8s.png)
 
-# Pre-requisites
+## Pre-requisites
 
-# Infrastructure
+## Infrastructure
 
-## Express Route / VPN
+### Express Route / VPN
 
-## Peering
+### Peering
 
-## Topology
+### Topology
 
 The network topology must be well defined beforehand to enable peering between the different VNET. This means that the subnet ip range musty be defined before deploying kubernetes. It cannot be changed afterwards.
 
-## Dns
+### Dns
 
-# Kubernetes
+## Kubernetes
 
 For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup with VPN/ExpressRoute. deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
 
-## Network
+### Network
 
-### Azure CNI
+#### Azure CNI
 
 By default, acs-engine is using the [**azure cni** network policy](https://github.com/Azure/acs-engine/blob/master/examples/networkpolicy/README.md#azure-container-networking-default) plugin. This has some advantages and some consequences that must be considered when defining the network where we deploy the cluster. CNI provides an integration with azure subnet ip addressing so that every pod created ny kubernetes is assigned an ip address from the corresponding subnet.
 
@@ -40,17 +39,17 @@ Consequences:
 - Network Security must be applied at the subnet level, using Azure NSG
 - You can avoid masquerading on outgoing network calls (packets origin are the pod ip, not the node ip)
 
-### Kubenet
+#### Kubenet
 
 The built-in kubernetes network plugin is [Kubenet](https://kubernetes.io/docs/concepts/cluster-administration/network-plugins/#kubenet).
 Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules.
 
-## Kubernetes Services
+### Kubernetes Services
 
 [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/) allow to access workloads running inside Kubernetes pods.
 Services can be published to be accessible outside of the Kubernetes cluster, either with a public Azure Load Balancer or with a private Azure Load Balancer (no public IP address).
 
-### Public load-balanced service
+#### Public load-balanced service
 
 ```yaml
 apiVersion: v1
@@ -68,7 +67,7 @@ spec:
     app: sqlinux
 ```
 
-### Private load-balanced service
+#### Private load-balanced service
 
 ```yaml
 apiVersion: v1
@@ -87,7 +86,7 @@ spec:
   type: LoadBalancer
 ```
 
-### External services
+#### External services
 
 When working in a cloud-hybrid environment, it is common to have to deal with external backend services that are running outside the Kubernetes cluster. They can be either running elsewhere in the cloud or on premise, for example.
 
@@ -134,6 +133,6 @@ spec:
 
 Note: when using service without selector, you can't have any Kubernetes readiness/health probe so you have to deal with this point by yourself. For backend services running in Azure, you can use Azure Load Balancers for health probes.
 
-## Devops
+### Devops
 
-# Conclusion
+## Conclusion
