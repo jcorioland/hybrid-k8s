@@ -118,7 +118,7 @@ subsets:
       - port: 8080
 ```
 
-Or you can use an external name in the specficiation of the service:
+Or you can use an external name in the specification of the service:
 
 ```yaml
 kind: Service
