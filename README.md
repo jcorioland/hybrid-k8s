@@ -153,7 +153,7 @@ Note: when using service without selector, you can't have any Kubernetes readine
 
 As explained in introduction we recommand to deploy the Kubernetes cluster into its own VNET and then use VNET peering to simplify multiple clusters manager, especially during Kubernetes upgrade.
 
-As you may know, ACS-Engine proposes an [upgrade command](https://github.com/Azure/acs-engine/tree/master/examples/k8s-upgrade). It is really important to understand that this uprade process could fail for any reason and may be ran multiple times. That means that in most cases, and especially with production clusters, a better approach consists into creating another Kubernetes cluster running the targeted version in another VNET, move the workloads into this new cluster, peer the networks and once everything is working as desired, set up the network redirection to this new deployment.
+As you may know, ACS-Engine proposes an [upgrade command](https://github.com/Azure/acs-engine/tree/master/examples/k8s-upgrade). It is really important to understand that this uprade process could fail for any reason and may need to be ran multiple times. That means that in most cases, and especially with production clusters, a better approach consists into creating another Kubernetes cluster running the targeted version in another VNET, move the workloads into this new cluster, peer the networks and once everything is working as desired, set up the network redirection to this new deployment.
 
 If you plan everything correctly following the documentation above and use Kubernetes Services properly to address both in-cluster and outside services, everything should work fine.
 
