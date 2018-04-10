@@ -8,7 +8,7 @@ Note : We do not cover a Kubernetes cluster _spanning_ a hybrid cloud network, b
 
 ![Kubernetes in an hybrid cloud network](assets/hybrid-k8s.png)
 
-As illustrated on the figure above, we recommand to deploy the Kubernetes cluster in its own dedicated VNET / subnets and then peer this VNET to the one that allows to access to other resources, both on-premises and in the cloud. Doing that allows to make easier the way you are going to manage multiple clusters and environments during application lifecycle (dev, qa, pre-prod, prod etc...) and simplify Kubernetes version upgrade (see [DevOps](#devops) section).
+As illustrated on the figure above, we recommand to deploy the Kubernetes cluster in its own dedicated VNET / subnets and then peer this VNET to the one that allows to access to other resources, both on-premises and in the cloud. This allows you to connect new vnet to your on-premise network by setting up an additional peering. It also separates clusters and environments infrastructure (dev, qa, pre-prod, prod etc...) and facilitate safe Kubernetes version upgrades (see [Cluster upgrades](#devops) section).
 
 ## Pre-requisites
 
@@ -33,9 +33,13 @@ In addition, you might want cluster services to address urls outside the cluster
 
 Note : There is some ongoing work to make this easier. See [acs-engine#2590](azure/acs-engine#2590)
 
+### Private Cluster
+
+By default, Kubernetes deployment with acs-engine expose the the admin api publicly (and securely). This can be avoided. Using peering with private/on-premise virtual network with ACS-Engine also allows you to create cloud-hosted [private cluster](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/features.md#private-cluster), with no endpoint exposed over the Internet.
+
 ## Kubernetes Network
 
-For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup with VPN/ExpressRoute. deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
+For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup to communicate through your VPN/ExpressRoute (see Peering). Deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
 
 ### Network
 
@@ -149,17 +153,13 @@ spec:
 
 Note: when using service without selector, you can't have any Kubernetes readiness/health probe so you have to deal with this point by yourself. For backend services running in Azure, you can use Azure Load Balancers for health probes.
 
-## DevOps
+## Cluster upgrades
 
-As explained in introduction we recommand to deploy the Kubernetes cluster into its own VNET and then use VNET peering to simplify multiple clusters manager, especially during Kubernetes upgrade.
-
-As you may know, ACS-Engine proposes an [upgrade command](https://github.com/Azure/acs-engine/tree/master/examples/k8s-upgrade). It is really important to understand that this uprade process could fail for any reason and may need to be ran multiple times. That means that in most cases, and especially with production clusters, a better approach consists into creating another Kubernetes cluster running the targeted version in another VNET, move the workloads into this new cluster, peer the networks and once everything is working as desired, set up the network redirection to this new deployment.
+As you may know, ACS-Engine proposes an [upgrade command](https://github.com/Azure/acs-engine/tree/master/examples/k8s-upgrade). It is really important to understand that this uprade process is *not* fail-safe. Therefore in most cases, and especially with production clusters, a good practice consists of creating another Kubernetes cluster running the targeted version in another VNET and move the workloads into this new cluster. Once everything is tested and works as desired, set up the network redirection to this new environment.
 
 If you plan everything correctly following the documentation above and use Kubernetes Services properly to address both in-cluster and outside services, everything should work fine.
 
-Using peering with private/on-premise virtual network with ACS-Engine also allows you to create [private cluster](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/features.md#private-cluster), with no endpoint exposed over the Internet.
-
 ## Conclusion
 
-Setting up Kubernetes to work in an hybrid cloud environment is absolutely possible today and many companies choose this path as a progressive move to the azure. You can benefit from the flexibility from the azure, while still keeping your existing systems running on your local network, and get them to talk to eachother seamlessly.
-However it must be noted that it still requires a non-negligible investment in the infrastructure setup, and maintenance.
+Setting up Kubernetes to work in an hybrid cloud environment is absolutely possible today and many companies choose this path as a progressive migration to Azure. You can benefit from the flexibility and scalability of Azure, maintain existing systems running on your local network, and get them to talk to eachother *seamlessly*.
+This however still requires a non-negligible investment in the infrastructure setup, and maintenance of it.
