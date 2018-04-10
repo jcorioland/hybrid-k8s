@@ -8,7 +8,7 @@ Note : We do not cover a Kubernetes cluster _spanning_ a hybrid cloud network, b
 
 ![Kubernetes in an hybrid cloud network](assets/hybrid-k8s.png)
 
-As illustrated on the figure above, we recommand to deploy the Kubernetes cluster in its own dedicated VNET / subnets and then peer this VNET to the one that allows to access to other resources, both on-premises and in the cloud. This allows you to connect new vnet to your on-premise network by setting up an additional peering. It also separates clusters and environments infrastructure (dev, qa, pre-prod, prod etc...) and facilitate safe Kubernetes version upgrades (see [Cluster upgrades](#devops) section).
+As illustrated on the figure above, we recommand to deploy the Kubernetes cluster in its own dedicated VNET / subnets and then peer this VNET to the one that allows to access to other resources, both on-premises and in the cloud. This allows you to connect new vnet to your on-premise network by setting up an additional peering. It also separates clusters and environments infrastructure (dev, qa, pre-prod, prod etc...) and facilitate safe Kubernetes version upgrades (see [Cluster upgrades](#cluster-upgrades) section).
 
 ## Pre-requisites
 
