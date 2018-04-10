@@ -157,4 +157,6 @@ As you may know, ACS-Engine proposes an [upgrade command](https://github.com/Azu
 
 If you plan everything correctly following the documentation above and use Kubernetes Services properly to address both in-cluster and outside services, everything should work fine.
 
+Using peering with private/on-premise virtual network with ACS-Engine also allows you to create [private cluster](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/features.md#private-cluster), with no endpoint exposed over the Internet.
+
 ## Conclusion
