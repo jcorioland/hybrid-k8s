@@ -37,15 +37,17 @@ For your kubernetes cluster to communicate with your on-premise network, you wil
 
 ### Network
 
-deploying Acs-engine on azure, you have 3 options of network policy. Azure CNI, Kubenet, or Calico.
+Deploying Acs-engine on azure, you have 3 options of network policy. Azure CNI, Kubenet, or Calico.
 
 #### Azure CNI
 
 By default, acs-engine is using the [**azure cni** network policy](https://github.com/Azure/acs-engine/blob/master/examples/networkpolicy/README.md#azure-container-networking-default) plugin. This has some advantages and some consequences that must be considered when defining the network where we deploy the cluster. CNI provides an integration with azure subnet ip addressing so that every pod created ny kubernetes is assigned an ip address from the corresponding subnet.
+All IP addresses are pre-allocated at provisionning time. By default, [acs-engine will pre-allocate 128 ips per node](https://github.com/Azure/azure-container-networking/blob/master/docs/acs.md#enabling-azure-vnet-plugins-for-an-acs-kubernetes-cluster) on the subnet.
+While this can be configured, new addresses will not be allocated dynamically. you need to plan for maximum scale.
 
 Consequences:
 
-- Plan for *large* address space
+- Plan for *large* address space.
 - Subnets where you deploy Kubernetes must be sized according to your scaling plan
 - You must account for [Kubernetes control plane](https://kubernetes.io/docs/concepts/overview/components/) services
 - Network Security must be applied at the subnet level, using Azure NSG
@@ -54,7 +56,7 @@ Consequences:
 #### Kubenet
 
 The built-in kubernetes network plugin is [Kubenet](https://kubernetes.io/docs/concepts/cluster-administration/network-plugins/#kubenet).
-Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules. This means you can plan for a much smaller address space as only your nodes will get an ip address on the pre-defined subnet.
+Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules. This means you can plan for a much smaller address space on your network as only the nodes will get an ip address.
 
 ### Kubernetes Services
 
@@ -100,9 +102,9 @@ spec:
 
 #### External services
 
-When working in a cloud-hybrid environment, it is common to have to deal with external backend services that are running outside the Kubernetes cluster. They can be either running elsewhere in the cloud or on premise, for example.
+When working in a cloud-hybrid environment, it is common to have to deal with external backend services that are running outside the Kubernetes cluster. They can be either running elsewhere in the cloud or on premise. A good practice is to abstract these external endpoints from within the cluster, using a Kubernetes Service.
 
-In those cases you can use services without selector:
+In these cases you can use services without selector:
 
 ```yaml
 kind: Service
@@ -116,7 +118,7 @@ spec:
     targetPort: 8080
 ```
 
-No endpoint will be created for this service. You can create one manually:
+No endpoint will be created for the above service. You can create one manually:
 
 ```yaml
 kind: Endpoints
