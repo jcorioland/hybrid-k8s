@@ -160,3 +160,6 @@ If you plan everything correctly following the documentation above and use Kuber
 Using peering with private/on-premise virtual network with ACS-Engine also allows you to create [private cluster](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/features.md#private-cluster), with no endpoint exposed over the Internet.
 
 ## Conclusion
+
+Setting up Kubernetes to work in an hybrid cloud environment is absolutely possible today and many companies choose this path as a progressive move to the azure. You can benefit from the flexibility from the azure, while still keeping your existing systems running on your local network, and get them to talk to eachother seamlessly.
+However it must be noted that it still requires a non-negligible investment in the infrastructure setup, and maintenance.
