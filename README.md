@@ -12,11 +12,13 @@ As illustrated on the figure above, we recommand to deploy the Kubernetes cluste
 
 ## Pre-requisites
 
-## Infrastructure
+This document assumes that you are familiar with:
 
-### Express Route / VPN
+- Deploying Kubernetes cluster in a [custom VNET using ACS-Engine](https://github.com/Azure/acs-engine/tree/master/examples/vnet)
+- Azure [VPN Gateway](https://azure.microsoft.com/en-us/services/vpn-gateway/) and/or [Azure Express Route](https://azure.microsoft.com/en-us/services/expressroute/)
+- Azure [Virtual Network Peering](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview)
 
-### Peering
+## Network and Infrastructure
 
 ### Topology
 
@@ -31,7 +33,7 @@ In addition, you might want cluster services to address urls outside the cluster
 
 Note : There is some ongoing work to make this easier. See [acs-engine#2590](azure/acs-engine#2590)
 
-## Kubernetes
+## Kubernetes Network
 
 For your kubernetes cluster to communicate with your on-premise network, you will have to deploy it to the existing vnet setup with VPN/ExpressRoute. deploying to an existing VNET is documented under [Custom VNET](https://github.com/Azure/acs-engine/blob/master/docs/custom-vnet.md).
 
@@ -58,12 +60,12 @@ Consequences:
 The built-in kubernetes network plugin is [Kubenet](https://kubernetes.io/docs/concepts/cluster-administration/network-plugins/#kubenet).
 Kubenet assigns virtual ips to the pods running in the cluster that are not part of the physical network infrastructure. The nodes are then configured to forward and masquerade the network calls using iptables rules. This means you can plan for a much smaller address space on your network as only the nodes will get an ip address.
 
-### Kubernetes Services
+## Kubernetes Services
 
 [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/) allow to access workloads running inside Kubernetes pods.
 Services can be published to be accessible outside of the Kubernetes cluster, either with a public Azure Load Balancer or with a private Azure Load Balancer (no public IP address).
 
-#### Public load-balanced service
+### Public load-balanced service
 
 ```yaml
 apiVersion: v1
@@ -81,7 +83,7 @@ spec:
     app: sqlinux
 ```
 
-#### Private load-balanced service
+### Private load-balanced service
 
 ```yaml
 apiVersion: v1
@@ -100,7 +102,7 @@ spec:
   type: LoadBalancer
 ```
 
-#### External services
+### External services
 
 When working in a cloud-hybrid environment, it is common to have to deal with external backend services that are running outside the Kubernetes cluster. They can be either running elsewhere in the cloud or on premise. A good practice is to abstract these external endpoints from within the cluster, using a Kubernetes Service.
 
@@ -147,7 +149,7 @@ spec:
 
 Note: when using service without selector, you can't have any Kubernetes readiness/health probe so you have to deal with this point by yourself. For backend services running in Azure, you can use Azure Load Balancers for health probes.
 
-### DevOps
+## DevOps
 
 As explained in introduction we recommand to deploy the Kubernetes cluster into its own VNET and then use VNET peering to simplify multiple clusters manager, especially during Kubernetes upgrade.
 
